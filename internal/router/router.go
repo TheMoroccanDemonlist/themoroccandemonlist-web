@@ -8,11 +8,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/themoroccandemonlist/themoroccandemonlist-web/internal/app"
 	"github.com/themoroccandemonlist/themoroccandemonlist-web/internal/config"
+	"github.com/themoroccandemonlist/themoroccandemonlist-web/internal/middleware"
 )
 
 func New(config *config.Config, application *app.App) *mux.Router {
 	router := mux.NewRouter()
 	router.Use(csrf.Protect(config.SessionKey))
+	router.Use(middleware.Logging)
+	router.Use(middleware.CSP)
 
 	// router.HandleFunc("/", application.HomeHandler).Methods("GET")
 
