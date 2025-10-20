@@ -6,8 +6,8 @@ import (
 )
 
 func Logging(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s %s", r.Method, r.URL.Path, r.RemoteAddr)
-		next.ServeHTTP(w, r)
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		log.Printf("%s %s %s", request.Method, request.URL.Path, request.RemoteAddr)
+		next.ServeHTTP(writer, request)
 	})
 }
