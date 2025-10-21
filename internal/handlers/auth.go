@@ -75,8 +75,6 @@ func (handler *Handler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	session.Save(r, w)
 
 	http.Redirect(w, r, "/profile", http.StatusSeeOther)
-
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
 }
 
 func (handler *Handler) Logout(w http.ResponseWriter, r *http.Request) {
