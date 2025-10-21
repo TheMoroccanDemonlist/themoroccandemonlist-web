@@ -20,6 +20,7 @@ type Config struct {
 	Session     sessions.Store
 	Environment string
 	SessionKey  []byte
+	DB          *pgx.Conn
 }
 
 func LoadEnv() {
@@ -29,12 +30,12 @@ func LoadEnv() {
 	}
 }
 
-func LoadDatabase() {
+func LoadDatabase() *pgx.Conn {
 	connection, err := pgx.Connect(context.Background(), os.Getenv("DB_URL"))
 	if err != nil {
 		log.Fatal("Unable to connect to PostgreSQL: ", err)
 	}
-	defer connection.Close(context.Background())
+	return connection
 }
 
 func Load() *Config {
@@ -70,10 +71,13 @@ func Load() *Config {
 		SameSite: http.SameSiteLaxMode,
 	}
 
+	databaseConnection := LoadDatabase()
+
 	return &Config{
 		OAuthConfig: oAuthConfig,
 		Session:     store,
 		Environment: environment,
 		SessionKey:  sessionKey,
+		DB:          databaseConnection,
 	}
 }

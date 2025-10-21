@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/themoroccandemonlist/themoroccandemonlist-web/internal/app"
+	"github.com/themoroccandemonlist/themoroccandemonlist-web/internal/repository"
 )
 
 type Handler struct {
@@ -59,6 +60,21 @@ func (handler *Handler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	session.Values["user"] = user
 	session.Values["authenticated"] = true
 	session.Save(r, w)
+
+	sub := user["sub"].(string)
+	email := user["email"].(string)
+
+	dbUser, err := repository.GetOrCreateUser(context.Background(), handler.App.Config.DB, email, sub)
+	if err != nil {
+		http.Error(w, "Failed to verify user", http.StatusInternalServerError)
+		return
+	}
+
+	session.Values["user_id"] = dbUser.ID
+	session.Values["authenticated"] = true
+	session.Save(r, w)
+
+	http.Redirect(w, r, "/profile", http.StatusSeeOther)
 
 	http.Redirect(w, r, "/profile", http.StatusSeeOther)
 }
