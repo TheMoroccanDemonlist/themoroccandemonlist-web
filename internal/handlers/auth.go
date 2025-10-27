@@ -70,6 +70,16 @@ func (handler *Handler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if dbUser.PlayerID == nil {
+		dbPlayer, err := repository.GetOrCreatePlayer(context.Background(), handler.App.Config.DB, dbUser.ID)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "Failed to verify player", http.StatusInternalServerError)
+			return
+		}
+		log.Println(dbPlayer)
+	}
+
 	session.Values["user_id"] = dbUser.ID
 	session.Values["authenticated"] = true
 	session.Save(r, w)

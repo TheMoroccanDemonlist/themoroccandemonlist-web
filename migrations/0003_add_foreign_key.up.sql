@@ -1,0 +1,7 @@
+ALTER TABLE users
+ADD COLUMN player_id UUID UNIQUE,
+ADD CONSTRAINT fk_player FOREIGN KEY (player_id) REFERENCES players(id);
+
+ALTER TABLE players
+ADD COLUMN user_id UUID UNIQUE,
+ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id);

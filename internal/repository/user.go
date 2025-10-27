@@ -9,11 +9,15 @@ import (
 
 func GetOrCreateUser(context context.Context, connection *pgx.Conn, email, sub string) (*domain.User, error) {
 	query := `
-        INSERT INTO users (email, sub)
-        VALUES ($1, $2)
-        ON CONFLICT (sub) DO UPDATE
-        SET email = EXCLUDED.email
-        RETURNING id, email, sub;
+        WITH inserted AS (
+            INSERT INTO users (email, sub)
+            VALUES ($1, $2)
+            ON CONFLICT (sub) DO NOTHING
+            RETURNING id, email, sub
+        )
+        SELECT id, email, sub FROM inserted
+        UNION
+        SELECT id, email, sub FROM users WHERE sub = $2;
     `
 
 	var user domain.User
